@@ -1,0 +1,19 @@
+{
+  "name": "deck-pdf-api",
+  "version": "1.0.0",
+  "description": "PDF generation API for deck.events using Puppeteer",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "puppeteer-core": "^21.7.0",
+    "@sparticuz/chromium": "^119.0.2",
+    "jspdf": "^2.5.1"
+  },
+  "devDependencies": {
+    "@vercel/node": "^3.0.12",
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.6"
+  }
+}

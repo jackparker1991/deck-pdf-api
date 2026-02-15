@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test PDF Generation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    button {
+      background: #0070f3;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0051cc;
+    }
+    #status {
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 6px;
+      display: none;
+    }
+    .success {
+      background: #d4edda;
+      color: #155724;
+    }
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .loading {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎨 PDF Generation API Test</h1>
+  <p>Click the button below to test your Vercel PDF API endpoint.</p>
+  
+  <label for="apiUrl">API URL:</label><br>
+  <input 
+    type="text" 
+    id="apiUrl" 
+    placeholder="https://your-project.vercel.app/api/generate-pdf"
+    style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px;"
+  >
+  
+  <br><br>
+  <button onclick="testPDF()">Generate Test PDF</button>
+  
+  <div id="status"></div>
+
+  <script>
+    async function testPDF() {
+      const apiUrl = document.getElementById('apiUrl').value;
+      const status = document.getElementById('status');
+      
+      if (!apiUrl) {
+        showStatus('Please enter your API URL', 'error');
+        return;
+      }
+
+      showStatus('Generating PDF...', 'loading');
+
+      const testSlide = {
+        html: `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+            <style>
+              body {
+                margin: 0;
+                width: 1920px;
+                height: 1080px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-family: 'Bebas Neue', sans-serif;
+              }
+              h1 {
+                font-size: 120px;
+                margin: 0;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+              }
+              p {
+                font-size: 48px;
+                margin: 20px 0 0 0;
+                opacity: 0.9;
+              }
+            </style>
+          </head>
+          <body>
+            <h1>IT WORKS! 🎉</h1>
+            <p>Your PDF API is running perfectly</p>
+          </body>
+          </html>
+        `,
+        index: 0
+      };
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            slides: [testSlide],
+            deckTitle: 'test-deck'
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.details || error.error || 'Failed to generate PDF');
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'test-deck.pdf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showStatus('✅ Success! PDF downloaded. Check your downloads folder.', 'success');
+      } catch (error) {
+        showStatus('❌ Error: ' + error.message, 'error');
+      }
+    }
+
+    function showStatus(message, type) {
+      const status = document.getElementById('status');
+      status.textContent = message;
+      status.className = type;
+      status.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
