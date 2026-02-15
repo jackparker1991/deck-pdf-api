@@ -42,12 +42,17 @@ export default async function handler(
 
     console.log(`🎨 Generating PDF for ${slides.length} slides...`);
 
+    // Configure chromium for Vercel environment
+    const executablePath = await chromium.executablePath();
+    
+    console.log('Chromium path:', executablePath);
+
     // Launch Puppeteer with chromium
     const browser = await puppeteer.launch({
-      args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
+      args: chromium.args,
       defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: true,
+      executablePath: executablePath,
+      headless: chromium.headless,
     });
 
     const page = await browser.newPage();
@@ -130,6 +135,6 @@ export default async function handler(
 
 // Vercel function configuration
 export const config = {
-  maxDuration: 60, // 60 seconds (requires Hobby plan, 10s on free tier)
-  memory: 1024, // 1GB memory
+  maxDuration: 60,
+  memory: 1024,
 };
